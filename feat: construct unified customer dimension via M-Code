@@ -1,0 +1,29 @@
+/* RETAIL BANKING: NEXT BEST ACTION MODEL
+   Phase 1 ETL Transformations
+   Target: Dim_Customer (Unified Master) & Fact_RM_Performance
+*/
+
+// 1. Unified Customer Dimension Construction
+let
+    // Load Retail Data
+    Source_Retail = Csv.Document(File.Contents("C:\Data\BANK_Savings_Consolidated_Master_Data.csv"),[Delimiter=",", Columns=30, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+    PromotedHeaders_Retail = Table.PromoteHeaders(Source_Retail, [PromoteAllScalars=true]),
+    Renamed_CustomerKey_Retail = Table.RenameColumns(PromotedHeaders_Retail,{{"Customer ID", "CustomerKey"}}),
+
+    // Load SME Data
+    Source_SME = Csv.Document(File.Contents("C:\Data\BANK_Current_Consolidated_Master_Data.csv"),[Delimiter=",", Columns=29, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+    PromotedHeaders_SME = Table.PromoteHeaders(Source_SME, [PromoteAllScalars=true]),
+    Renamed_CustomerKey_SME = Table.RenameColumns(PromotedHeaders_SME,{{"Merchant ID", "CustomerKey"}}),
+
+    // Append Queries to unify Retail and SME
+    AppendedQuery = Table.Combine({Renamed_CustomerKey_Retail, Renamed_CustomerKey_SME}),
+
+    // Engineer custom Financial Capacity column handling nulls across segments
+    Added_Financial_Capacity = Table.AddColumn(AppendedQuery, "Annual_Financial_Capacity", each [Annual Income] ?? [Annual Turnover], type number),
+    
+    // Cleanse Dimension: Remove transactional facts and duplicate keys
+    Removed_Fact_Columns = Table.SelectColumns(Added_Financial_Capacity,{"CustomerKey", "Gender", "Occupation", "Customer Segment", "Risk Rating", "Branch Code", "Tenure with Bank", "Annual_Financial_Capacity"}),
+    Removed_Duplicates = Table.Distinct(Removed_Fact_Columns, {"CustomerKey"}),
+    Filtered_Nulls = Table.SelectRows(Removed_Duplicates, each ([CustomerKey] <> null and [CustomerKey] <> ""))
+in
+    Filtered_Nulls
