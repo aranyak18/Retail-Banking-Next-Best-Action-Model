@@ -1,44 +1,43 @@
-# Retail-Banking-Next-Best-Action-Model
-Enterprise Power BI data model utilizing a Multi-Fact Star Schema and advanced DAX to drive Next-Best-Action cross-selling and RM performance analytics.
-
-
-# Retail Banking: Next Best Action & Performance Model
+# Retail Banking: Next Best Action Dashboard
 
 ## Project Overview
-This project is an enterprise-grade Business Intelligence solution designed to solve a core retail banking challenge: **Targeted Prospecting and Cross-Selling (Next Best Action)**. 
+This project is a Power BI dashboard designed to solve a practical problem I dealt with in retail banking: figuring out exactly who to call for cross-selling. 
 
-Rather than relying on flat, siloed data files, this project demonstrates a rigorous ETL pipeline and Data Modeling architecture to unify Retail and SME customer data. The resulting dashboard provides Branch Managers and Relationship Managers (RMs) with automated, dynamically ranked call lists based on financial capacity and existing product holdings.
+Instead of relying on flat, disconnected data exports, I built a data model that combines Retail and SME customer data. The end result is a dashboard that gives Branch Managers and Relationship Managers (RMs) a dynamically ranked call list based on a customer's financial capacity and what products they already hold.
 
-### Core Business Objectives
-1. **Identify Untapped Prospects:** Isolate high-net-worth/high-capacity customers who strictly lack specific product categories (e.g., Insurance).
-2. **Dynamic Prioritization:** Algorithmically rank prospects to tell RMs exactly *who* to call first to maximize conversion probability.
-3. **Performance Benchmarking:** Track and rank individual RM target achievement within specific branch contexts.
+### Core Business Goals
+1. **Find Untapped Prospects:** Identify high-capacity customers who do not currently hold specific products (like Insurance).
+2. **Prioritize Leads:** Rank these prospects so RMs know exactly who to contact first to maximize conversion chances.
+3. **Track RM Performance:** Monitor how individual RMs are performing against their monthly sales targets.
 
 ---
 
-## 🏗️ Technical Architecture
+## 🏗️ How It Was Built
 
 ### 1. Data Modeling (Multi-Fact Star Schema)
-The foundation of this model strictly adheres to dimensional modeling best practices to ensure DAX efficiency and eliminate ambiguous filter contexts.
-* **Unified Customer Dimension:** Appended disjointed Retail (Savings) and SME (Current) data sets into a single `Dim_Customer` master table.
-* **Conformed Dimensions:** Implemented a standalone `Dim_Branch` to act as a bridging filter between two distinct fact tables with different minimum grains (Branch-level sales vs. RM-level targets).
-* **Fact Tables:** Isolated measurable events into `Fact_Sales_Holdings`, `Fact_RM_Performance`, and `Fact_Insurance`.
+I structured the backend to follow dimensional modeling best practices so the DAX measures run efficiently.
+* **Unified Customer Dimension:** I used Power Query to append separate Retail (Savings) and SME (Current) datasets into a single `Dim_Customer` master table.
+* **Resolving Granularity:** I built a `Dim_Branch` table to act as a bridge. This handles the mismatch between data recorded at the branch level (sales) and data recorded at the RM level (targets).
+* **Fact Tables:** Divided the measurable data into `Fact_Sales_Holdings`, `Fact_RM_Performance`, and `Fact_Insurance`.
 
-### 2. Advanced DAX Implementation
-Bypassed basic aggregations in favor of complex evaluation context modifiers:
-* **Virtual Table Iteration:** Utilized `RANKX` over `FILTER(ALLSELECTED())` to dynamically score customers for cross-selling without permanently altering the physical data model.
-* **Cross-Table Logic:** Leveraged `ISEMPTY()` and `CALCULATETABLE()` to identify customers in the Sales Fact table who strictly do not exist in the Insurance Fact table.
-* **Time Intelligence:** Implemented standard YTD cumulative metrics using `DATESYTD`.
+### 2. DAX Logic
+I used DAX to handle the dynamic filtering and ranking rather than hardcoding columns.
+* **Dynamic Ranking:** Used `RANKX` inside a `FILTER(ALLSELECTED())` table to rank customers for cross-selling on the fly, which updates automatically when slicers are changed.
+* **Cross-Table Filtering:** Used `ISEMPTY()` and `CALCULATETABLE()` to specifically isolate customers in the sales table who do not have a record in the insurance table.
+* **Time Intelligence:** Standard YTD calculations for revenue tracking.
 
-### 3. UI/UX Design Principles
-Designed for executive cognitive clarity.
-* **Strict Corporate Palette:** Utilized a strategic FinTech hex-code theme to reduce eye strain and highlight actionable alerts.
-* **Information Hierarchy:** Follows a strict Top-Down flow (Global KPIs -> Analytical Context -> Actionable Granular Matrix).
-* **Advanced Navigation:** Integrated custom Report Page Tooltips to provide instant RM performance breakdowns upon hovering over branch-level visuals.
+### 3. Dashboard Design
+I focused on keeping the interface clean and strictly objective so users can find the data they need immediately.
+* **Clean Layout:** Removed default visual borders and used a simple, consistent color palette to avoid distractions.
+* **Top-Down Flow:** The page flows from high-level KPIs at the top, down to the granular, actionable call list at the bottom.
+* **Custom Tooltips:** Added a Report Page Tooltip. When a user hovers over a specific branch on the bar chart, a secondary visual pops up showing the performance of the RMs within that branch, keeping the main page uncluttered.
 
 ---
 
 ## 📊 Dashboard Previews
-*(Screenshots to be added upon final release)*
-* [Insert Screenshot of Main Cross-Sell Dashboard]
-* [Insert Screenshot of Custom Hover Tooltip]
+
+### Next-Best-Action Primary Interface
+![Main Dashboard](Main_Dashboard.png)
+
+### Dynamic RM Performance Tooltip
+![Custom Tooltip](Custom_Tooltip.png)
