@@ -37,7 +37,10 @@ I focused on keeping the interface clean and strictly objective so users can fin
 ## 📊 Dashboard Previews
 
 ### Next-Best-Action Primary Interface
-![Main Dashboard](Main_Dashboard.png)
+<img width="1920" height="1080" alt="Screenshot (47)" src="https://github.com/user-attachments/assets/5b9c609e-292a-4876-a3fa-fcb3c068b61f" />
+
 
 ### Dynamic RM Performance Tooltip
-![Custom Tooltip](Custom_Tooltip.png)
+<img width="1920" height="1080" alt="Screenshot (49)" src="https://github.com/user-attachments/assets/0c8f7028-6ed8-446d-9233-337b7fb258ee" />
+<img width="1920" height="1080" alt="Screenshot (48)" src="https://github.com/user-attachments/assets/ae3f434d-e10d-4861-9d67-11f2441808d9" />
+
