@@ -1,0 +1,67 @@
+/*
+   RETAIL BANKING: NEXT BEST ACTION MODEL
+   Core DAX Engine - Cross-Selling & Performance Benchmarking
+*/
+
+// MEASURE 1: Dynamic RM Target Achievement
+RM_Achievement_Pct = 
+DIVIDE (
+    SUM('Fact_RM_Performance'[Achieved Sales]),
+    SUM('Fact_RM_Performance'[Monthly Sales Target]),
+    BLANK()
+)
+
+// MEASURE 2: Cumulative Year-to-Date Revenue
+Revenue_YTD = 
+CALCULATE (
+    SUM('Fact_Sales_Holdings'[Revenue Contribution]),
+    DATESYTD('Dim_Date'[DateKey])
+)
+
+// MEASURE 3: Untapped Opportunity Sizing
+// Counts active customers in the branch who strictly lack insurance and meet wealth thresholds.
+Untapped_Insurance_Prospects = 
+CALCULATE (
+    DISTINCTCOUNT('Fact_Sales_Holdings'[CustomerKey]), 
+    FILTER (
+        'Dim_Customer',
+        ISEMPTY( CALCULATETABLE('Fact_Insurance') ) = TRUE() 
+        && 'Dim_Customer'[Annual_Financial_Capacity] >= 1500000
+    )
+)
+
+// MEASURE 4: Next-Best-Action Algorithmic Ranking
+// Prioritizes call lists for RMs based on liquid capital, excluding existing policyholders.
+Cross_Sell_Priority_Rank = 
+VAR CurrentCustomer = SELECTEDVALUE('Dim_Customer'[CustomerKey])
+VAR HasInsurance = NOT ISEMPTY( CALCULATETABLE('Fact_Insurance') )
+
+RETURN
+IF(
+    HasInsurance = TRUE() || ISBLANK(CurrentCustomer),
+    BLANK(), 
+    RANKX (
+        FILTER (
+            ALLSELECTED('Dim_Customer'),
+            ISEMPTY( CALCULATETABLE('Fact_Insurance') ) = TRUE()
+        ),
+        CALCULATE( SUM('Fact_Sales_Holdings'[Current Balance]) ),
+        ,
+        DESC,
+        Dense
+    )
+)
+
+// MEASURE 5: Dynamic RM Performance Benchmarking
+RM_Dynamic_Rank = 
+IF (
+    ISBLANK( SUM('Fact_RM_Performance'[Achieved Sales]) ),
+    BLANK(),
+    RANKX (
+        ALLSELECTED('Fact_RM_Performance'[RM ID]),
+        [RM_Achievement_Pct],
+        ,
+        DESC,
+        Dense
+    )
+)
